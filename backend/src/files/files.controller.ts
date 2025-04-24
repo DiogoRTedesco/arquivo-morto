@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Delete,
   Get,
@@ -60,6 +61,7 @@ export class FilesController {
   async uploadFile(
     @UploadedFile() file,
     @Param('employeeId', ParseIntPipe) employeeId: number,
+    @Body('userId',ParseIntPipe) userId: number
   ) {
     const employee = await this.prismaService.employee.findUnique({
       where: { id: employeeId },
@@ -74,8 +76,9 @@ export class FilesController {
       filePath: file.path,
       employee: {
         connect: { id: employeeId },
-      },
-    });
+      }
+    },
+      Number(userId));
   }
 
   @UseGuards(JwtAuthGuard)
@@ -100,7 +103,8 @@ export class FilesController {
   @Delete('delete/:id/:fileName')
   async deleteFile(
     @Param('id', ParseIntPipe) id: number,
-    @Param('fileName') fileName: string
+    @Param('fileName') fileName: string,
+    @Body('userId', ParseIntPipe) userId: number 
   ) {
     try {
       const filePath = path.join(process.cwd(), 'uploads', fileName); // Caminho absoluto do arquivo
@@ -110,7 +114,7 @@ export class FilesController {
       } else {
         throw new BadRequestException('File not found');
       }
-      return this.filesService.deleteFile(id, fileName);
+      return this.filesService.deleteFile(id, fileName, Number(userId));
     } catch (error) {
       console.error('Error deleting file:', error);
       throw new BadRequestException('Error deleting file');

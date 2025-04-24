@@ -6,7 +6,7 @@ export const FindEmployee: React.FC<findEmployeeProps> = ({ resultado }) => {
   return (
     <div className="space-y-2.5">
       {resultado.length > 0 ? (
-        <div className="px-4 py-2.5 bg-zinc-100  shadow flex items-center gap-3">
+        <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-3 items-center px-4 py-2.5 bg-zinc-100 shadow">
           <span className="text-zinc-900">Nome Funcionario</span>
           <span className="text-zinc-900 text-sm ml-auto">Nascimento</span>
           <span className="text-zinc-900 text-sm ml-auto">Admissão</span>
@@ -17,9 +17,10 @@ export const FindEmployee: React.FC<findEmployeeProps> = ({ resultado }) => {
       )}
       {resultado.map((res) => {
         return (
-            <Link to={`/arquivo/${res.id}`} key={res.id}>
-            <div className="px-4 py-2.5 bg-zinc-100 shadow flex items-center gap-3 hover:cursor-pointer">
-              <span className="text-zinc-900">{res.name}</span>{" "}
+          <Link to={`/arquivo/${res.id}`} key={res.id}>
+            {/*<div className="px-4 py-2.5 bg-zinc-100 shadow flex items-center gap-3 hover:cursor-pointer">*/}
+            <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-3 items-center px-4 py-2.5 bg-zinc-100 shadow hover:cursor-pointer">
+              <span className="text-zinc-900 truncate">{res.name}</span>{" "}
               <span className="text-zinc-900 text-sm ml-auto">
                 {new Date(res.birthDate).toLocaleDateString()}
               </span>{" "}

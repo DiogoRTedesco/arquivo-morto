@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../../lib/axiosConfig";
 import type { Employee, EmployeeFile } from "../../interfaces";
-import { maskCpf, maskCtps, pispasep } from "../../hooks/maskNumbers";
+import { maskCpf } from "../../hooks/maskNumbers";
 import { UploadFile } from "./upload-file";
 import { useAuth } from "../../contexts/AuthContext";
 import { Edit, Trash } from "lucide-react";
@@ -20,14 +20,15 @@ export const EmployeeDetails: React.FC = () => {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
   const { user } = useAuth();
-
+  const adminId = Number(sessionStorage.getItem("userId"))
   useEffect(() => {
     const fetchEmployee = async () => {
       try {
         const response = await api.get(`/employees/${id}`);
         setEmployee(response.data);
       } catch (error) {
-        console.error("Erro ao buscar funcionário", error);
+        toast.error("Erro ao buscar funcionário");
+        console.log("Erro ao buscar funcionário", error)
       }
     };
 
@@ -54,7 +55,8 @@ export const EmployeeDetails: React.FC = () => {
     formData.append("file", selectedFile);
 
     try {
-      await api.post(`/files/upload/${id}`, formData, {
+      await api.post(`/files/upload/${id}`, { ...formData, userId: adminId }, {
+
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -97,36 +99,16 @@ export const EmployeeDetails: React.FC = () => {
     api
       .put(`/employees/${id}`, updatedData)
       .then(() => {
-        toast.success("Funcionário atualizado com sucesso!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-        setTimeout(()=>{
+        toast.success("Funcionário atualizado com sucesso!");
+        setTimeout(() => {
           window.location.reload()
-        },4000)
+        }, 4000)
       })
       .catch((error) => {
         console.error("Erro ao atualizar os dados", error);
-        toast.error("Erro ao atualizar os dados!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-        
-        
+        toast.error("Erro ao atualizar os dados!");
+
+
       });
   };
   const handleDeleteFile = async (fileId: number, fileName: string) => {
@@ -139,30 +121,10 @@ export const EmployeeDetails: React.FC = () => {
           },
         });
 
-        toast.success("Arquivo removido com sucesso!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
+        toast.success("Arquivo removido com sucesso!");
       } catch (error) {
         console.error("Erro ao deletar o arquivo:", error);
-        toast.error("Erro ao deletar o arquivo!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
+        toast.error("Erro ao deletar o arquivo!");
       } finally {
         setIsLoading(false);
         window.location.reload();
@@ -201,15 +163,7 @@ export const EmployeeDetails: React.FC = () => {
               {maskCpf(employee.cpf)}
             </div>
             <div>
-              <span className="font-semibold">CTPS:</span>{" "}
-              {maskCtps(employee.ctps)}
-            </div>
-            <div>
               <span className="font-semibold">NRE:</span> {employee.nre}
-            </div>
-            <div>
-              <span className="font-semibold">PIS:</span>{" "}
-              {pispasep(employee.pis)}
             </div>
             <div>
               <span className="font-semibold">Data de Admissão:</span>{" "}
@@ -228,14 +182,14 @@ export const EmployeeDetails: React.FC = () => {
             {/* Ícone de edição */}
             {(user?.roles?.includes("STAFF") ||
               user?.roles?.includes("ADMIN")) && (
-              <button
-                className=" top-2 right-2 text-blue-500 hover:text-blue-700"
-                onClick={() => setIsEditModalOpen(true)}
-                title="Editar Informações do Usuário"
-              >
-                <Edit className="w-6 h-6" />
-              </button>
-            )}
+                <button
+                  className=" top-2 right-2 text-blue-500 hover:text-blue-700"
+                  onClick={() => setIsEditModalOpen(true)}
+                  title="Editar Informações do Usuário"
+                >
+                  <Edit className="w-6 h-6" />
+                </button>
+              )}
           </div>
           {/* Modal para Editar funcionário */}
           {/* Modal de edição */}
@@ -249,15 +203,15 @@ export const EmployeeDetails: React.FC = () => {
           {/* Botão para upload de arquivos */}
           {(user?.roles?.includes("STAFF") ||
             user?.roles?.includes("ADMIN")) && (
-            <div className="flex justify-end">
-              <button
-                onClick={openModal}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
-              >
-                Upload de Fichas
-              </button>
-            </div>
-          )}
+              <div className="flex justify-end">
+                <button
+                  onClick={openModal}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
+                >
+                  Upload de Fichas
+                </button>
+              </div>
+            )}
           {/* Área para exibir arquivos enviados */}
           <div className="bg-white p-4 rounded-lg shadow mt-4">
             <h2 className="text-lg font-semibold">Fichas Enviadas</h2>
@@ -273,15 +227,15 @@ export const EmployeeDetails: React.FC = () => {
                     </button>
                     {(user?.roles?.includes("STAFF") ||
                       user?.roles?.includes("ADMIN")) && (
-                      <button
-                        className="ml-4"
-                        onClick={() => handleDeleteFile(file.id, file.fileName)}
-                        title="Remover ficha"
-                        disabled={isLoading}
-                      >
-                        <Trash className="size-4" />
-                      </button>
-                    )}
+                        <button
+                          className="ml-4"
+                          onClick={() => handleDeleteFile(file.id, file.fileName)}
+                          title="Remover ficha"
+                          disabled={isLoading}
+                        >
+                          <Trash className="size-4" />
+                        </button>
+                      )}
                   </div>
                 </li>
               ))}

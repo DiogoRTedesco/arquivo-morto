@@ -30,6 +30,7 @@ export const UserProfilePage: React.FC = () => {
     password: "",
     accessLevel: "",
   });
+  const adminId = Number(sessionStorage.getItem("userId"))
   const token = sessionStorage.getItem("accessToken");
 
   useEffect(() => {
@@ -38,17 +39,7 @@ export const UserProfilePage: React.FC = () => {
         setUsers(response.data);
       });
     } catch (error) {
-      toast.error("Erro ao carregar usuários!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      toast.error("Erro ao carregar usuários!");
     }
   }, []);
 
@@ -59,43 +50,23 @@ export const UserProfilePage: React.FC = () => {
   const handleCreateUser = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      await api.post("/auth/signup", newUser, {
+      await api.post("/users", { ...newUser, userId: adminId }, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      toast.success("Usuário criado com sucesso!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      toast.success("Usuário criado com sucesso!");
     } catch (error) {
-      toast.error("Erro ao criar usuário!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      toast.error("Erro ao criar usuário!",);
       setTimeout(() => {
         window.location.reload();
       }, 5000);
     } finally {
       setIsModalOpen(false);
-      setTimeout(()=>{
+      setTimeout(() => {
         window.location.reload()
-      },5000)
+      }, 5000)
     }
   };
 
@@ -109,37 +80,18 @@ export const UserProfilePage: React.FC = () => {
 
       api
         .delete(`/users/${userId}`, {
+          data: { userId: adminId },
           headers: {
             Authorization: `Bearer ${token}`,
           },
         })
         .then(() => {
-          toast.success("Usuário excluído com sucesso!", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            transition: Bounce,
-          });
+          toast.success("Usuário excluído com sucesso!");
 
           setUsers(users.filter((user) => user.id !== userId));
         })
         .catch(() => {
-          toast.error("Erro ao excluir o usuário!", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            transition: Bounce,
-          });
+          toast.error("Erro ao excluir o usuário!",);
         });
     } else {
       console.log("Ação de exclusão cancelada");
@@ -156,82 +108,42 @@ export const UserProfilePage: React.FC = () => {
     setIsEditUserModalOpen(true);
   };
   const onPasswordChange = (userId: number, newPassword: string) => {
-    
-    if(newPassword){
-      api.put(`/users/password/${userId}`,{password:newPassword},{
-        headers:{
+
+    if (newPassword) {
+      api.put(`/users/password/${userId}`, { password: newPassword, userId: adminId }, {
+        headers: {
           Authorization: `Bearer ${token}`,
         },
       })
-      .then(()=>{
-        toast.success("Senha alterada com sucesso!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-        setTimeout(()=>{
-          window.location.reload()
-        },5000)
-      }).catch(()=>{
-        toast.error("Erro ao alterar a senha do usuário!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-      })
+        .then(() => {
+          toast.success("Senha alterada com sucesso!");
+          setTimeout(() => {
+            window.location.reload()
+          }, 5000)
+        }).catch(() => {
+          toast.error("Erro ao alterar a senha do usuário!");
+        })
     }
-    
+
   };
 
   const onEditUserSubmit = (userId: number, updatedAccessLevel: string) => {
-    if(updatedAccessLevel){
-      api.put(`/users/accessLevel/${userId}`,{accessLevel: updatedAccessLevel},
+    if (updatedAccessLevel) {
+      api.put(`/users/accessLevel/${userId}`, { accessLevel: updatedAccessLevel, userId: adminId },
         {
-          headers:{
+          headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       )
-      .then(()=>{
-        toast.success("Permissão de usuário alterada com sucesso!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-        setTimeout(()=>{
-          window.location.reload()
-        },5000)
-      }).catch(()=>{
-        toast.error("Erro ao alterar a Permissão do usuário!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-      })
+        .then(() => {
+          toast.success("Permissão de usuário alterada com sucesso!");
+          setTimeout(() => {
+            window.location.reload()
+          }, 5000)
+        }).catch(() => {
+          toast.error("Erro ao alterar a Permissão do usuário!");
+        })
     }
   };
 
@@ -350,15 +262,15 @@ export const UserProfilePage: React.FC = () => {
             onChangePassword={onPasswordChange}
           />
         )}
-{isEditUserModalOpen && selectedUserId !== null && (
-  <EditUserModal
-    userId={selectedUserId}
-    currentAccessLevel={users.find((user) => user.id === selectedUserId)?.accessLevel || "USER" }
-     
-    setIsEditUserModalOpen={() => setIsEditUserModalOpen(false)}
-    onEditUser={onEditUserSubmit}
-  />
-)}
+        {isEditUserModalOpen && selectedUserId !== null && (
+          <EditUserModal
+            userId={selectedUserId}
+            currentAccessLevel={users.find((user) => user.id === selectedUserId)?.accessLevel || "USER"}
+
+            setIsEditUserModalOpen={() => setIsEditUserModalOpen(false)}
+            onEditUser={onEditUserSubmit}
+          />
+        )}
       </div>
     </div>
   );

@@ -1,7 +1,6 @@
 // src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useState } from "react";
-
-import {api} from "../lib/axiosConfig";
+import { api } from "../lib/axiosConfig";
 import type { AuthContextType, LoginCredentials, User } from "../interfaces";
 
 
@@ -24,7 +23,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean| null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,9 +38,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsAuthenticated(true);
     } else if (refreshToken) {
       refreshAccessToken(refreshToken); // Tentativa de atualizar o accessToken se estiver expirado
-    } 
-      setLoading(false); // Finaliza o carregamento caso não haja tokens válidos
-    
+    }
+    setLoading(false); // Finaliza o carregamento caso não haja tokens válidos
+
   }, []);
 
   const token = sessionStorage.getItem("acessToken");
@@ -65,11 +64,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         roles: userData.role,
       });
       setIsAuthenticated(true);
+      sessionStorage.setItem('userId', userData.id)
     } catch (err) {
       setError("Falha ao realizar login");
     }
-      setLoading(false);
-    
+    setLoading(false);
+
   };
 
   const logout = () => {

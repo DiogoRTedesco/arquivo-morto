@@ -7,6 +7,7 @@ import { Unauthorized } from "../pages/unauthorized";
 import { EmployeeRecords } from "../pages/arquivo";
 import { Navbar } from "../components/navbar";
 import { EmployeeDetails } from "../pages/arquivo-detalhes";
+import { LogSearchPage } from "../pages/logSystem";
 
 const Routes = () => {
   return (
@@ -28,9 +29,10 @@ const Routes = () => {
         {/* Rota protegida */}
         <Route element={<PrivateRoute roles={["ADMIN"]} />}>
           <Route path="/users" element={<UserProfilePage />} />
+          <Route path="/logs" element={<LogSearchPage />} />
         </Route>
 
-        <Route element={<PrivateRoute roles={["USER" ]} />}>
+        <Route element={<PrivateRoute roles={["USER"]} />}>
           <Route path="/arquivo" element={<EmployeeRecords />} />
           <Route path="/arquivo/:id" element={<EmployeeDetails />} />
         </Route>

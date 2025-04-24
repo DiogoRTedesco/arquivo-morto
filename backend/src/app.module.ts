@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { RolesGuard } from './auth/guards/roles.guard';
@@ -10,6 +9,8 @@ import { EmployeesModule } from './employees/employees.module';
 import { FilesModule } from './files/files.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PrismaService } from './prisma/prisma.service';
+import { LogsSystemModule } from './logs-system/logs-system.module';
+import { AccessLevelModule } from './access-level/access-level.module';
 
 @Module({
   imports: [
@@ -22,7 +23,9 @@ import { PrismaService } from './prisma/prisma.service';
     }),
     ConfigModule.forRoot(),
     FilesModule,
-    EmployeesModule, // Importa o módulo de configuração para ler variáveis de ambiente
+    EmployeesModule,
+    LogsSystemModule,
+    AccessLevelModule, // Importa o módulo de configuração para ler variáveis de ambiente
   ],
   providers: [
     PrismaService,
@@ -31,5 +34,6 @@ import { PrismaService } from './prisma/prisma.service';
       useClass: RolesGuard,
     },
   ],
+ 
 })
 export class AppModule {}

@@ -14,14 +14,6 @@ export class CreateEmployeeDto {
   cpf?: string;
 
   @IsOptional()
-  @IsString()
-  pis?: string;
-
-  @IsOptional()
-  @IsString()
-  ctps?: string;
-
-  @IsOptional()
   @IsDateString()
   admissionDate?: string;
 

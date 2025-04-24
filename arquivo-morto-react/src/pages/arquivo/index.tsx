@@ -14,8 +14,6 @@ export const EmployeeRecords: React.FC = () => {
   const [name, setName] = useState("");
   const [cpf, setCpf] = useState("");
   const [nascimento, setNascimento] = useState<Date | null>(null);
-  const [ctps, setCtps] = useState("");
-  const [pis, setPis] = useState("");
   const [rescisao, setRescisao] = useState<Date | null>(null);
   const [admissao, setAdmissao] = useState<Date | null>(null);
   const [nre, setNre] = useState("");
@@ -23,6 +21,7 @@ export const EmployeeRecords: React.FC = () => {
   const [resultado, setResultado] = useState<Employee[]>([]);
   const { user } = useAuth();
   const token = sessionStorage.getItem("accessToken"); // Obtenha o token armazenado
+  const adminId = Number(sessionStorage.getItem("userId"))
   const navigate = useNavigate();
 
   const openModal = () => {
@@ -36,8 +35,6 @@ export const EmployeeRecords: React.FC = () => {
     name: name,
     birthDate: nascimento,
     cpf: removeMask(cpf),
-    pis: removeMask(pis),
-    ctps: removeMask(ctps),
     admissionDate: admissao,
     terminationDate: rescisao,
     nre: nre,
@@ -46,38 +43,18 @@ export const EmployeeRecords: React.FC = () => {
   const createEmployee = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      const response = await api.post<Employee>("/employees", employeeData, {
+      const response = await api.post<Employee>("/employees", { ...employeeData, userId: adminId }, {
         headers: {
           Authorization: `Bearer ${token}`, // Enviar o token no cabeçalho da requisição
         },
       });
 
-      toast.success("Funcionário criado com sucesso!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      toast.success("Funcionário criado com sucesso!");
       setTimeout(() => {
         navigate(`/arquivo/${response.data.id}`);
       }, 3000);
     } catch (error) {
-      toast.error("Erro ao criar funcionário!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      toast.error("Erro ao criar funcionário!");
       setTimeout(() => {
         window.location.reload();
       }, 3000);
@@ -98,18 +75,8 @@ export const EmployeeRecords: React.FC = () => {
           .then((response) => {
             setResultado(response.data); // Tratar a resposta aqui
           });
-      }else{
-        toast.error("Preencha o campo!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
+      } else {
+        toast.error("Preencha o campo!");
       }
     } catch (error) {
       console.log(error); // Tratar o erro aqui
@@ -135,7 +102,7 @@ export const EmployeeRecords: React.FC = () => {
           pauseOnHover
           theme="light"
           transition={Bounce}
-          
+
         />
 
         <main className="flex gap-16 px-4">
@@ -183,13 +150,13 @@ export const EmployeeRecords: React.FC = () => {
             {/* Verifica role para exibir o botão */}
             {(user?.roles?.includes("STAFF") ||
               user?.roles?.includes("ADMIN")) && (
-              <button
-                onClick={openModal}
-                className="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400"
-              >
-                Cadastrar Novo
-              </button>
-            )}
+                <button
+                  onClick={openModal}
+                  className="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400"
+                >
+                  Cadastrar Novo
+                </button>
+              )}
           </div>
         </main>
 
@@ -200,12 +167,10 @@ export const EmployeeRecords: React.FC = () => {
             createEmployee={createEmployee}
             setAdmissionDate={setAdmissao}
             setCpf={setCpf}
-            setCtps={setCtps}
             setName={setName}
             setBirthDate={setNascimento}
             setNre={setNre}
             setTerminationDate={setRescisao}
-            setPis={setPis}
             admissionDate={admissao}
             terminationDate={rescisao}
             birthDate={nascimento}

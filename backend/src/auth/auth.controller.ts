@@ -18,9 +18,5 @@ export class AuthController {
     return this.authService.refreshAccessToken(refreshToken);
   }
 
-  @Post('signup')
-  @HttpCode(HttpStatus.CREATED)
-  async signup(@Body() createUserDto: CreateUserDto) {
-    return this.authService.signup(createUserDto);
-  }
+ 
 }

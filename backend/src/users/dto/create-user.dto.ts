@@ -1,5 +1,5 @@
-import { AccessLevel } from '@prisma/client';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { AccessLevel } from 'src/access-level/enum/access-level.enum';
 
 export class CreateUserDto {
   @IsString()

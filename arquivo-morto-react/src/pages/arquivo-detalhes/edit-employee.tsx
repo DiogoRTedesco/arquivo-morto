@@ -3,8 +3,6 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
   maskCpf,
-  maskCtps,
-  pispasep,
   removeMask,
 } from "../../hooks/maskNumbers";
 
@@ -14,8 +12,6 @@ interface EditEmployeeProps {
     name: string;
     birthDate: Date;
     cpf: string;
-    pis: string;
-    ctps: string;
     admissionDate: Date;
     terminationDate: Date;
     nre: string;
@@ -33,9 +29,7 @@ export const EditEmployee: React.FC<EditEmployeeProps> = ({
   const [name, setName] = useState("");
   const [birthDate, setBirthDate] = useState<Date | null>(null);
   const [cpfValue, setCpfValue] = useState("");
-  const [ctpsValue, setCtpsValue] = useState("");
   const [nre, setNre] = useState("");
-  const [pisValue, setPisValue] = useState("");
   const [admissionDate, setAdmissionDate] = useState<Date | null>(null);
   const [terminationDate, setTerminationDate] = useState<Date | null>(null);
 
@@ -44,9 +38,7 @@ export const EditEmployee: React.FC<EditEmployeeProps> = ({
       setName(employeeData.name);
       setBirthDate(new Date(employeeData.birthDate));
       setCpfValue(maskCpf(employeeData.cpf));
-      setCtpsValue(maskCtps(employeeData.ctps));
       setNre(employeeData.nre);
-      setPisValue(pispasep(employeeData.pis));
       setAdmissionDate(new Date(employeeData.admissionDate));
       if (employeeData.terminationDate) {
         setTerminationDate(new Date(employeeData.terminationDate));
@@ -60,9 +52,7 @@ export const EditEmployee: React.FC<EditEmployeeProps> = ({
       name,
       birthDate,
       cpf: removeMask(cpfValue),
-      ctps: removeMask(ctpsValue),
       nre,
-      pis: removeMask(pisValue),
       admissionDate,
       terminationDate,
     };
@@ -151,26 +141,6 @@ export const EditEmployee: React.FC<EditEmployeeProps> = ({
                   placeholderText="Data de Demissão"
                 />
               </div>
-            </div>
-            <div>
-              <label className="text-sm">PIS</label>
-              <input
-                type="text"
-                placeholder="Nº do PIS"
-                className="border p-2 rounded-lg w-full"
-                value={pisValue}
-                onChange={(e) => setPisValue(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="text-sm">CTPS</label>
-              <input
-                type="text"
-                placeholder="Nº da CTPS"
-                className="border p-2 rounded-lg w-full"
-                value={ctpsValue}
-                onChange={(e) => setCtpsValue(e.target.value)}
-              />
             </div>
             <div>
               <label className="text-sm">Nº de Registro</label>

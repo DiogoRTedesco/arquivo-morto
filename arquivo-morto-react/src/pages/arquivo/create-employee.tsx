@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { maskCpf, maskCtps, pispasep } from "../../hooks/maskNumbers"; 
+import { maskCpf } from "../../hooks/maskNumbers";
 import type { modalProps } from "../../interfaces";
 
 
@@ -17,33 +17,22 @@ export const CreateEmployee: React.FC<modalProps> = ({
   setAdmissionDate,
   terminationDate,
   setTerminationDate,
-  setCtps,
+
   setNre,
-  setPis,
+
 }) => {
 
-  const [cpfValue, setCpfValue] = useState(""); 
-  const [pisValue, setPisValue] = useState(""); 
-  const [ctpsValue, setCtpsValue] = useState(""); 
-  
+  const [cpfValue, setCpfValue] = useState("");
+
   const handleCpfChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const formattedCpf = maskCpf(event.target.value); 
-    setCpfValue(formattedCpf); 
-    setCpf(formattedCpf); 
+    const formattedCpf = maskCpf(event.target.value);
+    setCpfValue(formattedCpf);
+    setCpf(formattedCpf);
   };
-  const handlePisChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const formattedPis = pispasep(event.target.value); 
-    setPisValue(formattedPis); 
-    setPis(formattedPis); 
-  };
-  const handleCtpsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const formattedCtps = maskCtps(event.target.value); 
-    setCtpsValue(formattedCtps); 
-    setCtps(formattedCtps); 
-  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex justify-center items-center z-50 ">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-3/4">
         <h2 className="text-xl font-semibold mb-4">
           Cadastrar Novo Funcionário
         </h2>
@@ -52,10 +41,10 @@ export const CreateEmployee: React.FC<modalProps> = ({
             <input
               type="text"
               placeholder="Nome do Funcionário"
-              className="border p-2 rounded-lg w-3/4"
+              className="border p-2 rounded-lg w-full"
               onChange={(event) => setName(event.target.value)}
             />
-            <div className="w-3/4">
+            <div className="w-full">
               <DatePicker
                 selected={birthDate}
                 onChange={(date) => setBirthDate(date)}
@@ -66,18 +55,18 @@ export const CreateEmployee: React.FC<modalProps> = ({
                 showYearDropdown
                 dropdownMode="select"
                 dateFormat="dd/MM/yyyy"
-                className="border p-2 rounded-lg w-full cursor-pointer" 
+                className="border p-2 rounded-lg w-full cursor-pointer"
                 placeholderText="Data de Nascimento"
               />
             </div>
             <input
               type="text"
               placeholder="CPF"
-              className="border p-2 rounded-lg w-3/4"
-              value={cpfValue} 
+              className="border p-2 rounded-lg w-full"
+              value={cpfValue}
               onChange={handleCpfChange}
             />
-            <div className="w-3/4">
+            <div className="w-full">
               <DatePicker
                 selected={admissionDate}
                 onChange={(date) => setAdmissionDate(date)}
@@ -88,11 +77,11 @@ export const CreateEmployee: React.FC<modalProps> = ({
                 showYearDropdown
                 dropdownMode="select"
                 dateFormat="dd/MM/yyyy"
-                className="border p-2 rounded-lg w-full cursor-pointer" 
+                className="border p-2 rounded-lg w-full cursor-pointer"
                 placeholderText="Data de Admissão"
               />
             </div>
-            <div className="w-3/4">
+            <div className="w-full">
               <DatePicker
                 selected={terminationDate}
                 onChange={(date) => setTerminationDate(date)}
@@ -107,24 +96,11 @@ export const CreateEmployee: React.FC<modalProps> = ({
                 placeholderText="Data de Demissão"
               />
             </div>
-            <input
-              type="text"
-              placeholder="Nº do PIS"
-              className="border p-2 rounded-lg w-3/4"
-              value={pisValue} 
-              onChange={handlePisChange}
-            />
-            <input
-              type="text"
-              placeholder="Nº da CTPS"
-              className="border p-2 rounded-lg w-3/4"
-              value={ctpsValue} 
-              onChange={handleCtpsChange}
-            />
+
             <input
               type="text"
               placeholder="Nº de Registro do Empregado"
-              className="border p-2 rounded-lg w-3/4"
+              className="border p-2 rounded-lg w-full"
               onChange={(event) => setNre(event.target.value)}
             />
           </div>
@@ -134,7 +110,7 @@ export const CreateEmployee: React.FC<modalProps> = ({
               className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
             >
               Cadastrar
-              
+
             </button>
             <button
               type="button"
