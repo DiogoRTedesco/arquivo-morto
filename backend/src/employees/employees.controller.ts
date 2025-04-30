@@ -24,7 +24,10 @@ export class EmployeesController {
   @UseGuards(JwtAuthGuard)
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createEmployee(@Body() createEmployeeDto: CreateEmployeeDto, userId: ParseIntPipe) {
+  async createEmployee(
+  @Body() body: any
+  ) {
+    const {userId, ...createEmployeeDto} = body
     return this.employeesService.createEmployee(createEmployeeDto, Number(userId));
   }
 
@@ -33,8 +36,9 @@ export class EmployeesController {
   @HttpCode(HttpStatus.CREATED)
   async updateEmployee(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: CreateEmployeeDto, userId: ParseIntPipe
+    @Body() body: any
   ) {
+    const { userId, ...data } = body;
     return this.employeesService.updateEmployee(id, data, Number(userId));
   }
 

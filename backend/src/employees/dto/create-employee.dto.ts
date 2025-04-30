@@ -1,4 +1,5 @@
-import { IsDateString, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsDateString, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateEmployeeDto {
   @IsNotEmpty()
@@ -24,4 +25,9 @@ export class CreateEmployeeDto {
   @IsOptional()
   @IsString()
   nre?: string;
+
+    @IsNotEmpty()
+    @IsInt()
+    @Type(() => Number)
+    userId: number;
 }

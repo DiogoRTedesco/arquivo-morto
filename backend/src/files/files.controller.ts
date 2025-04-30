@@ -20,8 +20,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PrismaService } from '../prisma/prisma.service';
 import { FilesService } from './files.service';
+import {UploadFileDto} from './dto/uploadFile.dto'
 import * as fs from 'fs';
 import * as path from 'path';
+import { DeleteFileDto } from './dto/deleteFile.dto';
 
 @ApiTags('files')
 @Controller('files')
@@ -37,7 +39,7 @@ export class FilesController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads',
+        destination: '/app/uploads',
         filename: (req, file, cb) => {
           const filename: string = uuidv4();
           const extension: string = file.originalname.split('.').pop();
@@ -61,7 +63,7 @@ export class FilesController {
   async uploadFile(
     @UploadedFile() file,
     @Param('employeeId', ParseIntPipe) employeeId: number,
-    @Body('userId',ParseIntPipe) userId: number
+    @Body() body: UploadFileDto,
   ) {
     const employee = await this.prismaService.employee.findUnique({
       where: { id: employeeId },
@@ -70,15 +72,18 @@ export class FilesController {
     if (!employee) {
       throw new Error('Employee not found');
     }
+    
+    const userId = body.userId;
 
     return this.filesService.uploadFile({
       fileName: file.filename,
       filePath: file.path,
       employee: {
         connect: { id: employeeId },
-      }
-    },
-      Number(userId));
+      },
+    }, Number(userId));
+   
+    
   }
 
   @UseGuards(JwtAuthGuard)
@@ -88,7 +93,18 @@ export class FilesController {
     @Param('filename') filename: string,
     @Res() res: Response,
   ) {
-    res.download(`./uploads/${filename}`);
+    const filePath = path.join('/app/uploads', filename);
+
+    if (!fs.existsSync(filePath)) {
+      throw new BadRequestException('Arquivo não encontrado');
+    }
+
+    return res.download(filePath, filename, (err) => {
+      if (err) {
+        console.error('Erro ao fazer download do arquivo:', err);
+        throw new BadRequestException('Erro ao baixar o arquivo');
+      }
+    });
   }
 
   @Get('employee/:employeeId')
@@ -104,21 +120,22 @@ export class FilesController {
   async deleteFile(
     @Param('id', ParseIntPipe) id: number,
     @Param('fileName') fileName: string,
-    @Body('userId', ParseIntPipe) userId: number 
+    @Body() body: DeleteFileDto,
   ) {
     try {
-      const filePath = path.join(process.cwd(), 'uploads', fileName); // Caminho absoluto do arquivo
+      const filePath = path.join('/app/uploads', fileName);
 
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath); 
-      } else {
-        throw new BadRequestException('File not found');
-      }
-      return this.filesService.deleteFile(id, fileName, Number(userId));
-    } catch (error) {
-      console.error('Error deleting file:', error);
-      throw new BadRequestException('Error deleting file');
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    } else {
+      throw new BadRequestException('File not found');
     }
+
+    return this.filesService.deleteFile(id, fileName, Number(body.userId));
+  } catch (error) {
+    console.error('Error deleting file:', error);
+    throw new BadRequestException('Error deleting file');
   }
+}
 }
 

@@ -33,7 +33,7 @@ export const UserProfilePage: React.FC = () => {
   const adminId = Number(sessionStorage.getItem("userId"))
   const token = sessionStorage.getItem("accessToken");
 
-  useEffect(() => {
+  const getUsers = () => {
     try {
       api.get("/users").then((response) => {
         setUsers(response.data);
@@ -41,6 +41,10 @@ export const UserProfilePage: React.FC = () => {
     } catch (error) {
       toast.error("Erro ao carregar usuários!");
     }
+
+  }
+  useEffect(() => {
+    getUsers()
   }, []);
 
   const filteredUsers = users.filter((user) =>
@@ -57,16 +61,23 @@ export const UserProfilePage: React.FC = () => {
       });
 
       toast.success("Usuário criado com sucesso!");
+
+      setNewUser({
+        username: "",
+        password: "",
+        accessLevel: "",
+      })
     } catch (error) {
-      toast.error("Erro ao criar usuário!",);
-      setTimeout(() => {
-        window.location.reload();
-      }, 5000);
+      toast.error(`Erro ao criar usuário!, ${error}`);
+      setNewUser({
+        username: "",
+        password: "",
+        accessLevel: "",
+      })
+      getUsers()
     } finally {
       setIsModalOpen(false);
-      setTimeout(() => {
-        window.location.reload()
-      }, 5000)
+      getUsers()
     }
   };
 
@@ -76,7 +87,6 @@ export const UserProfilePage: React.FC = () => {
     );
 
     if (isConfirmed) {
-      console.log("Usuário confirmado para exclusão:", userId);
 
       api
         .delete(`/users/${userId}`, {
@@ -86,7 +96,7 @@ export const UserProfilePage: React.FC = () => {
           },
         })
         .then(() => {
-          toast.success("Usuário excluído com sucesso!");
+          toast.success(`Usuário excluído com sucesso! ,  Id: ${userId}`);
 
           setUsers(users.filter((user) => user.id !== userId));
         })
@@ -117,11 +127,9 @@ export const UserProfilePage: React.FC = () => {
       })
         .then(() => {
           toast.success("Senha alterada com sucesso!");
-          setTimeout(() => {
-            window.location.reload()
-          }, 5000)
-        }).catch(() => {
-          toast.error("Erro ao alterar a senha do usuário!");
+          getUsers()
+        }).catch((error) => {
+          toast.error(`Erro ao alterar a senha do usuário!, ${error}`);
         })
     }
 
@@ -138,9 +146,7 @@ export const UserProfilePage: React.FC = () => {
       )
         .then(() => {
           toast.success("Permissão de usuário alterada com sucesso!");
-          setTimeout(() => {
-            window.location.reload()
-          }, 5000)
+          getUsers()
         }).catch(() => {
           toast.error("Erro ao alterar a Permissão do usuário!");
         })

@@ -21,16 +21,17 @@ export const EmployeeDetails: React.FC = () => {
   const closeModal = () => setIsModalOpen(false);
   const { user } = useAuth();
   const adminId = Number(sessionStorage.getItem("userId"))
+
+  const fetchEmployee = async () => {
+    try {
+      const response = await api.get(`/employees/${id}`);
+      setEmployee(response.data);
+    } catch (error) {
+      toast.error("Erro ao buscar funcionário");
+      console.log("Erro ao buscar funcionário", error)
+    }
+  };
   useEffect(() => {
-    const fetchEmployee = async () => {
-      try {
-        const response = await api.get(`/employees/${id}`);
-        setEmployee(response.data);
-      } catch (error) {
-        toast.error("Erro ao buscar funcionário");
-        console.log("Erro ao buscar funcionário", error)
-      }
-    };
 
     fetchEmployee();
   }, [id]);
@@ -53,9 +54,9 @@ export const EmployeeDetails: React.FC = () => {
 
     const formData = new FormData();
     formData.append("file", selectedFile);
-
+    formData.append("userId", adminId.toString());
     try {
-      await api.post(`/files/upload/${id}`, { ...formData, userId: adminId }, {
+      await api.post(`/files/upload/${id}`, formData, {
 
         headers: {
           "Content-Type": "multipart/form-data",
@@ -64,9 +65,11 @@ export const EmployeeDetails: React.FC = () => {
       // Após o upload, atualizar a lista de arquivos
       setIsModalOpen(false);
       setSelectedFile(null);
+      toast.success("Arquivo enviado com sucesso!")
       const response = await api.get(`/files/employee/${id}`);
       setFiles(response.data);
     } catch (error) {
+      toast.error(`Erro ao fazer upload do arquivo, ${error}`)
       console.error("Erro ao fazer upload do arquivo:", error);
     }
   };
@@ -97,12 +100,10 @@ export const EmployeeDetails: React.FC = () => {
 
   const handleUpdateEmployee = (updatedData: Employee) => {
     api
-      .put(`/employees/${id}`, updatedData)
+      .put(`/employees/${id}`, { ...updatedData, userId: adminId })
       .then(() => {
         toast.success("Funcionário atualizado com sucesso!");
-        setTimeout(() => {
-          window.location.reload()
-        }, 4000)
+        fetchEmployee();
       })
       .catch((error) => {
         console.error("Erro ao atualizar os dados", error);
@@ -116,18 +117,22 @@ export const EmployeeDetails: React.FC = () => {
       try {
         setIsLoading(true);
         await api.delete(`/files/delete/${fileId}/${fileName}`, {
+          data: { userId: adminId },
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
           },
         });
 
         toast.success("Arquivo removido com sucesso!");
+        const response = await api.get(`/files/employee/${id}`);
+        setFiles(response.data);
       } catch (error) {
         console.error("Erro ao deletar o arquivo:", error);
         toast.error("Erro ao deletar o arquivo!");
+
       } finally {
         setIsLoading(false);
-        window.location.reload();
+
       }
     }
   };
